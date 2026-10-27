@@ -1,0 +1,230 @@
+{% extends 'base.html' %}
+
+{% block title %}Lumera Cosmetics — Discover Your Radiance{% endblock %}
+
+{% block content %}
+
+<!-- ═══════════ HERO SECTION ═══════════ -->
+<section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+        <p class="hero-tag">Premium Beauty Collection</p>
+        <h1>Discover Your<br><em>Radiance</em></h1>
+        <p class="hero-sub">Luxurious skincare, makeup, and fragrances crafted to enhance your natural beauty.</p>
+        <a href="{% url 'shop' %}" class="btn btn-primary btn-lg">Shop Now</a>
+    </div>
+    <!-- Decorative elements -->
+    <div class="hero-deco hero-deco-1"></div>
+    <div class="hero-deco hero-deco-2"></div>
+</section>
+
+<!-- ═══════════ FEATURED PRODUCTS ═══════════ -->
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <p class="section-tag">Curated For You</p>
+            <h2>Featured Products</h2>
+            <div class="section-line"></div>
+        </div>
+
+        <div class="product-grid">
+            {% for product in featured_products %}
+            <div class="product-card">
+                <a href="{% url 'product_detail' product.slug %}" class="product-img-wrap">
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-img">
+                    {% else %}
+                        <div class="product-img-placeholder" data-category="{{ product.category.name }}">
+                            <span>{{ product.name|truncatewords:3 }}</span>
+                        </div>
+                    {% endif %}
+                </a>
+                <div class="product-info">
+                    <p class="product-category">{{ product.category.name }}</p>
+                    <h3 class="product-name"><a href="{% url 'product_detail' product.slug %}">{{ product.name }}</a></h3>
+                    <div class="product-rating">
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= product.rating|floatformat:0 %}
+                                <span class="star filled">&#9733;</span>
+                            {% else %}
+                                <span class="star">&#9733;</span>
+                            {% endif %}
+                        {% endfor %}
+                        <span class="rating-num">{{ product.rating }}</span>
+                    </div>
+                    <div class="product-bottom">
+                        <span class="product-price">${{ product.price }}</span>
+                        <form action="{% url 'add_to_cart' product.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary-sm" {% if product.stock <= 0 %}disabled{% endif %}>
+                                {% if product.stock <= 0 %}Out of Stock{% else %}Add to Cart{% endif %}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p class="empty-state">No featured products yet. Run <code>python manage.py populate_db</code> to add sample products.</p>
+            {% endfor %}
+        </div>
+
+        <div class="text-center" style="margin-top: 2.5rem;">
+            <a href="{% url 'shop' %}" class="btn btn-outline">View All Products</a>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ POPULAR CATEGORIES ═══════════ -->
+<section class="section section-alt">
+    <div class="container">
+        <div class="section-header">
+            <p class="section-tag">Browse By</p>
+            <h2>Popular Categories</h2>
+            <div class="section-line"></div>
+        </div>
+
+        <div class="category-grid">
+            <a href="{% url 'shop' %}?category=skincare" class="category-card" data-cat="Skincare">
+                <div class="category-icon">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+                </div>
+                <h3>Skincare</h3>
+                <p>Nourish &amp; protect</p>
+            </a>
+            <a href="{% url 'shop' %}?category=makeup" class="category-card" data-cat="Makeup">
+                <div class="category-icon">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                </div>
+                <h3>Makeup</h3>
+                <p>Enhance your look</p>
+            </a>
+            <a href="{% url 'shop' %}?category=lip-care" class="category-card" data-cat="Lip Care">
+                <div class="category-icon">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z"/></svg>
+                </div>
+                <h3>Lip Care</h3>
+                <p>Soft &amp; colorful</p>
+            </a>
+            <a href="{% url 'shop' %}?category=hair-care" class="category-card" data-cat="Hair Care">
+                <div class="category-icon">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+                </div>
+                <h3>Hair Care</h3>
+                <p>Strengthen &amp; shine</p>
+            </a>
+            <a href="{% url 'shop' %}?category=body-care" class="category-card" data-cat="Body Care">
+                <div class="category-icon">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.24 12.24a6 6 0 00-8.49-8.49L5 10.5V19h8.5z"/><line x1="16" y1="8" x2="2" y2="22"/><line x1="17.5" y1="15" x2="9" y2="15"/></svg>
+                </div>
+                <h3>Body Care</h3>
+                <p>Pamper yourself</p>
+            </a>
+            <a href="{% url 'shop' %}?category=fragrance" class="category-card" data-cat="Fragrance">
+                <div class="category-icon">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2h8l-1 9a5 5 0 01-6 0L8 2z"/><path d="M12 11v4"/><rect x="9" y="15" width="6" height="6" rx="1"/></svg>
+                </div>
+                <h3>Fragrance</h3>
+                <p>Your signature scent</p>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ PROMOTIONAL BANNER ═══════════ -->
+<section class="promo-banner">
+    <div class="container">
+        <div class="promo-content">
+            <p class="promo-tag">Limited Time Offer</p>
+            <h2>Free Shipping on Orders Over $50</h2>
+            <p>Use code <strong>LUMERA50</strong> at checkout to enjoy free standard shipping on all orders above $50. Offer valid while stocks last.</p>
+            <a href="{% url 'shop' %}" class="btn btn-white btn-lg">Shop the Collection</a>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ CUSTOMER REVIEWS ═══════════ -->
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <p class="section-tag">Testimonials</p>
+            <h2>What Our Customers Say</h2>
+            <div class="section-line"></div>
+        </div>
+
+        <div class="reviews-grid">
+            <div class="review-card">
+                <div class="review-stars">
+                    <span class="star filled">&#9733;</span>
+                    <span class="star filled">&#9733;</span>
+                    <span class="star filled">&#9733;</span>
+                    <span class="star filled">&#9733;</span>
+                    <span class="star filled">&#9733;</span>
+                </div>
+                <p class="review-text">"The Rose Glow Serum has completely transformed my skin. After just two weeks, my complexion is brighter and more hydrated than ever. Absolutely love it!"</p>
+                <div class="review-author">
+                    <div class="review-avatar">SE</div>
+                    <div>
+                        <strong>Sarah Edwards</strong>
+                        <p>Verified Buyer</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="review-card">
+                <div class="review-stars">
+                    <span class="star filled">&#9733;</span>
+                    <span class="star filled">&#9733;</span>
+                    <span class="star filled">&#9733;</span>
+                    <span class="star filled">&#9733;</span>
+                    <span class="star filled">&#9733;</span>
+                </div>
+                <p class="review-text">"I've tried so many foundations, but the Silk Finish Foundation is on another level. Perfect coverage, lasts all day, and looks so natural. My go-to now!"</p>
+                <div class="review-author">
+                    <div class="review-avatar">MP</div>
+                    <div>
+                        <strong>Maya Patel</strong>
+                        <p>Verified Buyer</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="review-card">
+                <div class="review-stars">
+                    <span class="star filled">&#9733;</span>
+                    <span class="star filled">&#9733;</span>
+                    <span class="star filled">&#9733;</span>
+                    <span class="star filled">&#9733;</span>
+                    <span class="star">&#9733;</span>
+                </div>
+                <p class="review-text">"The Midnight Rose perfume is absolutely stunning. I get compliments everywhere I go. The scent lasts all day and the bottle looks gorgeous on my vanity."</p>
+                <div class="review-author">
+                    <div class="review-avatar">JW</div>
+                    <div>
+                        <strong>Jessica Williams</strong>
+                        <p>Verified Buyer</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="review-card">
+                <div class="review-stars">
+                    <span class="star filled">&#9733;</span>
+                    <span class="star filled">&#9733;</span>
+                    <span class="star filled">&#9733;</span>
+                    <span class="star filled">&#9733;</span>
+                    <span class="star filled">&#9733;</span>
+                </div>
+                <p class="review-text">"Finally found a lip treatment that actually works overnight. My lips are so soft every morning. The Lipstick in Crimson Rose is the perfect bold red too!"</p>
+                <div class="review-author">
+                    <div class="review-avatar">AL</div>
+                    <div>
+                        <strong>Amara Lopez</strong>
+                        <p>Verified Buyer</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

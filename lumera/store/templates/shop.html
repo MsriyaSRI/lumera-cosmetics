@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block title %}Shop All Products — Lumera Cosmetics{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>{% if active_category %}{{ active_category }}{% else %}All Products{% endif %}</h1>
+            {% if search_query %}
+                <p class="page-sub">Search results for "<strong>{{ search_query }}</strong>"</p>
+            {% endif %}
+        </div>
+
+        <!-- Filters Bar -->
+        <div class="shop-filters">
+            <div class="filter-group">
+                <label>Category:</label>
+                <form action="{% url 'shop' %}" method="get" class="filter-form" id="categoryFilter">
+                    <input type="hidden" name="search" value="{{ search_query }}">
+                    <input type="hidden" name="sort" value="{{ sort_option }}">
+                    <select name="category" onchange="this.form.submit()">
+                        <option value="">All Categories</option>
+                        {% for cat in categories %}
+                            <option value="{{ cat.slug }}" {% if category_slug == cat.slug %}selected{% endif %}>{{ cat.name }}</option>
+                        {% endfor %}
+                    </select>
+                </form>
+            </div>
+
+            <div class="filter-group">
+                <label>Sort by:</label>
+                <form action="{% url 'shop' %}" method="get" class="filter-form" id="sortFilter">
+                    <input type="hidden" name="search" value="{{ search_query }}">
+                    <input type="hidden" name="category" value="{{ category_slug }}">
+                    <select name="sort" onchange="this.form.submit()">
+                        <option value="newest" {% if sort_option == 'newest' or not sort_option %}selected{% endif %}>Newest First</option>
+                        <option value="price_low" {% if sort_option == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                        <option value="price_high" {% if sort_option == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                        <option value="rating" {% if sort_option == 'rating' %}selected{% endif %}>Highest Rated</option>
+                    </select>
+                </form>
+            </div>
+
+            <div class="filter-count">
+                {{ products|length }} product{{ products|length|pluralize }}
+            </div>
+        </div>
+
+        <!-- Product Grid -->
+        <div class="product-grid">
+            {% for product in products %}
+            <div class="product-card">
+                <a href="{% url 'product_detail' product.slug %}" class="product-img-wrap">
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-img">
+                    {% else %}
+                        <div class="product-img-placeholder" data-category="{{ product.category.name }}">
+                            <span>{{ product.name|truncatewords:3 }}</span>
+                        </div>
+                    {% endif %}
+                </a>
+                <div class="product-info">
+                    <p class="product-category">{{ product.category.name }}</p>
+                    <h3 class="product-name"><a href="{% url 'product_detail' product.slug %}">{{ product.name }}</a></h3>
+                    <div class="product-rating">
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= product.rating|floatformat:0 %}
+                                <span class="star filled">&#9733;</span>
+                            {% else %}
+                                <span class="star">&#9733;</span>
+                            {% endif %}
+                        {% endfor %}
+                        <span class="rating-num">{{ product.rating }}</span>
+                    </div>
+                    <div class="product-bottom">
+                        <span class="product-price">${{ product.price }}</span>
+                        <form action="{% url 'add_to_cart' product.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary-sm" {% if product.stock <= 0 %}disabled{% endif %}>
+                                {% if product.stock <= 0 %}Out of Stock{% else %}Add to Cart{% endif %}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state-full">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <h3>No products found</h3>
+                <p>Try adjusting your search or filter criteria.</p>
+                <a href="{% url 'shop' %}" class="btn btn-outline">View All Products</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Order Confirmed — Lumera Cosmetics{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="confirmation-wrap">
+            <div class="confirmation-icon">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <h1>Order Confirmed!</h1>
+            <p class="confirmation-thanks">Thank you for shopping with Lumera Cosmetics, {{ order.full_name }}!</p>
+
+            <div class="confirmation-details">
+                <div class="confirm-row">
+                    <span>Order Number</span>
+                    <strong>#LUM-{{ order.id|stringformat:"05d" }}</strong>
+                </div>
+                <div class="confirm-row">
+                    <span>Date</span>
+                    <strong>{{ order.created_at|date:"M d, Y" }}</strong>
+                </div>
+                <div class="confirm-row">
+                    <span>Email</span>
+                    <strong>{{ order.email }}</strong>
+                </div>
+                <div class="confirm-row">
+                    <span>Shipping To</span>
+                    <strong>{{ order.address }}, {{ order.city }} - {{ order.pincode }}</strong>
+                </div>
+                <div class="confirm-row">
+                    <span>Status</span>
+                    <strong class="status-badge status-{{ order.status|lower }}">{{ order.status }}</strong>
+                </div>
+                <hr>
+                <div class="confirm-row confirm-total">
+                    <span>Total Paid</span>
+                    <strong>${{ order.total_amount }}</strong>
+                </div>
+            </div>
+
+            <!-- Ordered Items -->
+            <div class="confirmation-items">
+                <h3>Items Ordered</h3>
+                {% for item in order.items.all %}
+                <div class="confirm-item">
+                    <span>{{ item.product_name }} &times; {{ item.quantity }}</span>
+                    <span>${{ item.subtotal }}</span>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="confirmation-actions">
+                <a href="{% url 'shop' %}" class="btn btn-primary btn-lg">Continue Shopping</a>
+                <a href="{% url 'home' %}" class="btn btn-outline btn-lg">Back to Home</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
