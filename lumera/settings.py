@@ -11,12 +11,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key secret in production!
 # This key is fine for a local internship project.
-SECRET_KEY = 'django-insecure-lumera-cosmetics-internship-2024-change-in-production!'
+SECRET_KEY = os.environ.get('SECRET_KEY') or 'django-insecure-local-development-only'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ['*']
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+ALLOWED_HOSTS = os.environ.get(
+    'ALLOWED_HOSTS', 'localhost,127.0.0.1'
+).split(',')
 
 # -----------------------------------------------------------
 # Application definition
@@ -72,7 +73,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 # -----------------------------------------------------------
 # Authentication — use Django's built-in user model
 # -----------------------------------------------------------
